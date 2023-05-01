@@ -1,0 +1,99 @@
+name: MyST Publish
+author: Curvenote
+description: Publish MyST content from a Github repository to curve.space hosting
+branding:
+  icon: 'zap'
+  color: 'blue'
+inputs:
+  latex_packages:
+    description: space-separated list of latex packages to install with tlmgr
+    required: false
+  preview:
+    description: 'deploy temporary preview build to alternative domain; useful when running this action on a PR'
+    required: false
+    default: false
+  preview_subdomain:
+    description: 'domain for temporary preview build; required for preview build'
+    required: false
+runs:
+  using: 'composite'
+  steps:
+    - name: Determine action to take - deploy or remove
+      run: $GITHUB_ACTION_PATH/lib/determine-auto-action.sh
+      shell: bash
+
+    - name: Deploy the site with explicit preview domain
+      if: ${{ inputs.preview == 'true' && !inputs.preview_subdomain && env.action == 'deploy' }}
+      run: |
+        echo "preview deploy requires preview_subdomain"
+        exit 1
+      shell: bash
+
+    - name: Setup node
+      if: ${{ env.action == 'deploy' || env.action == 'remove' }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - name: 'Checkout ${{github.ref}} branch'
+      if: ${{ env.action == 'deploy' || env.action == 'remove' }}
+      uses: actions/checkout@v3
+
+    - name: Install imagemagick, inkscape, and webp
+      if: ${{ env.action == 'deploy' }}
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y inkscape imagemagick webp
+
+    - name: Install TeX and packages
+      if: ${{ env.action == 'deploy' }}
+      shell: bash
+      run: |
+        wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
+        echo "/home/runner/bin" >> $GITHUB_PATH
+
+    - name: Install TeX packages
+      if: ${{ env.action == 'deploy' && inputs.latex_packages }}
+      shell: bash
+      run: |
+        tlmgr install ${{ inputs.latex_packages }}
+
+    - name: Update NPM, install CLIs, and check versions
+      if: ${{ env.action == 'deploy' || env.action == 'remove' }}
+      shell: bash
+      run: |
+        npm install -g npm@latest
+        npm install -g myst-cli curvenote
+        myst -v
+        curvenote -v
+        curvenote auth list
+
+    - name: Build all content
+      if: env.action == 'deploy'
+      run: myst build --all
+      shell: bash
+
+    - name: Deploy the site with explicit preview domain
+      if: ${{ inputs.preview == 'true' && inputs.preview_subdomain && env.action == 'deploy' }}
+      run: curvenote deploy -y --ci --domain ${{ inputs.preview_subdomain }}_PR${{ github.event.pull_request.number }}.curve.space
+      shell: bash
+
+    - name: Message with preview build link
+      if: ${{ inputs.preview == 'true' && inputs.preview_subdomain && env.action == 'deploy' }}
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        message: |
+          Preview deployed to https://${{ inputs.preview_subdomain }}_PR${{ github.event.pull_request.number }}.curve.space
+
+    - name: Deploy the site
+      if: ${{ inputs.preview == 'false' && env.action == 'deploy' }}
+      run: curvenote deploy -y --ci
+      shell: bash
+
+    - name: Message with preview build link
+      if: ${{ inputs.preview == 'false' && env.action == 'deploy' }}
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        message: |
+          Site deployed to domain specified in myst.yml
