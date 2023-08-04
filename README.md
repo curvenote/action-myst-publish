@@ -33,6 +33,8 @@ jobs:
     steps:
       - name: Deploy 🚀
         uses: curvenote/action-myst-publish
+        env:
+          CURVENOTE_TOKEN: ${{ secrets.CURVENOTE_TOKEN }}
 ```
 
 ## Example: Deploy preview on PR:
@@ -55,6 +57,8 @@ jobs:
     steps:
       - name: Deploy 🚀
         uses: curvenote/action-myst-publish
+        env:
+          CURVENOTE_TOKEN: ${{ secrets.CURVENOTE_TOKEN }}
         with:
           preview: true
           preview_subdomain: username-myst_preview
