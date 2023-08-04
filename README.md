@@ -25,6 +25,7 @@ on:
     branches:
       - main
 permissions:
+  contents: read
   pull-requests: write
 jobs:
   build-and-deploy:
@@ -46,6 +47,7 @@ on:
       - synchronize
       - closed
 permissions:
+  contents: read
   pull-requests: write
 jobs:
   build-and-deploy-preview:
