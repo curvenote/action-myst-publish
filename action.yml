@@ -63,7 +63,7 @@ runs:
       if: ${{ env.action == 'deploy' || env.action == 'remove' }}
       shell: bash
       run: |
-        npm install -g npm@latest
+        npm install -g npm@^8
         npm install -g mystmd curvenote
         myst -v
         curvenote -v
