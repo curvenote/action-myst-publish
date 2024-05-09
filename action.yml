@@ -33,7 +33,7 @@ runs:
       if: ${{ env.action == 'deploy' || env.action == 'remove' }}
       uses: actions/setup-node@v3
       with:
-        node-version: 16
+        node-version: 20
 
     - name: 'Checkout ${{github.ref}} branch'
       if: ${{ env.action == 'deploy' || env.action == 'remove' }}
