@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy 🚀
-        uses: curvenote/action-myst-publish
+        uses: curvenote/action-myst-publish@v1
         env:
           CURVENOTE_TOKEN: ${{ secrets.CURVENOTE_TOKEN }}
 ```
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy 🚀
-        uses: curvenote/action-myst-publish
+        uses: curvenote/action-myst-publish@v1
         env:
           CURVENOTE_TOKEN: ${{ secrets.CURVENOTE_TOKEN }}
         with:
