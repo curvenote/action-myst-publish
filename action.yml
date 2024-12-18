@@ -64,14 +64,13 @@ runs:
       shell: bash
       run: |
         npm install -g npm@^8
-        npm install -g mystmd curvenote
-        myst -v
+        npm install -g curvenote
         curvenote -v
         curvenote auth list
 
     - name: Build all content
       if: env.action == 'deploy'
-      run: myst build --all
+      run: curvenote build --all
       shell: bash
 
     - name: Deploy the site with explicit preview domain
@@ -96,4 +95,4 @@ runs:
       uses: marocchino/sticky-pull-request-comment@v2
       with:
         message: |
-          Site deployed to domain specified in myst.yml
+          Site deployed to domain specified in Curvenote configuration yml
