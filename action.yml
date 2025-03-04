@@ -31,13 +31,13 @@ runs:
 
     - name: Setup node
       if: ${{ env.action == 'deploy' || env.action == 'remove' }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: 20
 
     - name: 'Checkout ${{github.ref}} branch'
       if: ${{ env.action == 'deploy' || env.action == 'remove' }}
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install imagemagick, inkscape, and webp
       if: ${{ env.action == 'deploy' }}
@@ -70,12 +70,12 @@ runs:
 
     - name: Build all content
       if: env.action == 'deploy'
-      run: curvenote build --all
+      run: curvenote build -d --all
       shell: bash
 
     - name: Deploy the site with explicit preview domain
       if: ${{ inputs.preview == 'true' && inputs.preview_subdomain && env.action == 'deploy' }}
-      run: curvenote deploy -y --ci --domain ${{ inputs.preview_subdomain }}_PR${{ github.event.pull_request.number }}.curve.space
+      run: curvenote deploy -y -d --ci --domain ${{ inputs.preview_subdomain }}_PR${{ github.event.pull_request.number }}.curve.space
       shell: bash
 
     - name: Message with preview build link
@@ -87,7 +87,7 @@ runs:
 
     - name: Deploy the site
       if: ${{ inputs.preview == 'false' && env.action == 'deploy' }}
-      run: curvenote deploy -y --ci
+      run: curvenote deploy -y -d --ci
       shell: bash
 
     - name: Message with preview build link
