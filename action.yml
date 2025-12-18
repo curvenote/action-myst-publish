@@ -64,7 +64,7 @@ runs:
       shell: bash
       run: |
         npm install -g npm@^8
-        npm install -g curvenote
+        npm install -g curvenote@latest
         curvenote -v
         curvenote auth list
 
